@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title id="appTitle">VIP WINGO 30S MOD - MURAD</title>
+    <style>
+        /* --- [CSS স্টাইল] --- */
+        body { margin: 0; padding: 0; font-family: 'Consolas', monospace, 'Segoe UI'; background-color: #000; overflow: hidden; touch-action: manipulation; }
+        #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5; background-color: #000; }
+        
+        /* লগইন ওভারলে */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.5); }
+        .password-box { background-color: rgba(0, 50, 0, 0.9); padding: 30px 40px; border-radius: 10px; box-shadow: 0 0 20px #0f0; text-align: center; width: 90%; max-width: 320px; border: 2px solid #0f0; }
+        .password-box h2 { color: #0f0; margin-bottom: 25px; font-size: 24px; text-shadow: 0 0 5px #0f0; }
+        .password-box input[type="password"] { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #0f0; background: #000; color: #0f0; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
+        .password-box button { background-color: #0f0; color: black; padding: 10px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 18px; font-weight: bold; transition: background-color 0.3s; margin-top: 5px; }
+        .password-box button:hover { background-color: #ff9800; color: white; }
+        .error-message { color: #ff4d4d; margin-top: 10px; font-weight: bold; }
+        
+        /* অ্যাপ স্ক্রিনের স্টাইল */
+        #backgroundSite { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; visibility: hidden; }
+        #topPanel { position: fixed; top: 0; left: 0; width: 100%; background-color: #1a1a1a; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); z-index: 100; color: #fff; padding: 5px 10px; box-sizing: border-box; display: none; align-items: center; justify-content: space-around; }
+        #preStartPanel { display: flex; align-items: center; justify-content: center; width: 100%; }
+        #startButton { background-color: #ff0073; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-left: 10px; }
+        #signalDisplay { display: none; align-items: center; flex-grow: 1; justify-content: space-around; text-align: center; padding: 0 10px; }
+        
+        /* সিগন্যাল ডিসপ্লে */
+        .signal-item h4 { margin: 0; font-size: 10px; color: #aaa; text-transform: uppercase; }
+        .clock-val, .remaining-val { font-size: 14px; font-weight: bold; color: #00e676; }
+        .signal-indicator { display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .signal-text { 
+            font-size: 16px; font-weight: bold; padding: 3px 8px; border-radius: 4px; color: white; 
+            background-color: #ccc; min-width: 40px; text-align: center; box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
+        }
+        .number-box { 
+            width: 25px; height: 25px; line-height: 25px; border-radius: 50%; font-size: 14px; 
+            font-weight: bold; margin-left: 5px; color: white; background-color: #f44336; 
+        }
+        @keyframes flashing { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .flashing { animation: flashing 0.2s infinite; }
+        #telegramLink { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 10; color: #00aaff; text-decoration: none; font-size: 14px; padding: 5px 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <canvas id="matrixCanvas"></canvas>
+
+    <iframe id="backgroundSite" src="https://dkwin9.com/#/register?invitationCode=87452717774" allowfullscreen></iframe>
+
+    <div id="loginOverlay">
+        <div class="password-box">
+            <h2>🔐 VIP ACCESS REQUIRED</h2>
+            <input type="password" id="passwordInput" placeholder="ENTER SECRET KEY">
+            <button onclick="checkPassword()">ACTIVATE MOD</button>
+            <p id="errorMessage" class="error-message"></p>
+        </div>
+    </div>
+    
+    <div id="topPanel">
+        <div id="preStartPanel">
+            <span style="color:#ffcc00; font-weight:bold; font-size:12px;">DKWIN9 এ লগইন করে WinGo 30S এ যান, তারপর ক্লিক করুন:</span>
+            <button id="startButton" onclick="startSignalHack()">START HACK</button>
+        </div>
+
+        <div id="signalDisplay">
+            <div class="signal-item"><h4>Clock</h4><span id="currentClock" class="clock-val">--:--:--</span></div>
+            <div class="signal-item"><h4>Remaining</h4><span id="remainingTimer" class="remaining-val">--s</span></div>
+            <div class="signal-item">
+                <h4>Result</h4>
+                <div class="signal-indicator">
+                    <span id="signalText" class="signal-text">---</span>
+                    <span id="numberDisplay" class="number-box">#</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <a id="telegramLink" href="আপনার টেলিগ্রাম গ্রুপের লিঙ্ক এখানে দিন" target="_blank">
+        Join Telegram COMMUNITY
+    </a>
+    
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+    // ⚠️ আপনার Firebase কনফিগারেশন এখানে বসান
+    const firebaseConfig = {
+        apiKey: "AIzaSyDNSQoPL5gPU7f7tTabWwOM1KBjDnCA6Sc", 
+        authDomain: "shieldxvpn-b12e6.firebaseapp.com",
+        databaseURL: "https://shieldxvpn-b12e6-default-rtdb.firebaseio.com",
+        projectId: "shieldxvpn-b12e6",
+    };
+
+    // Firebase ইনিশিয়ালাইজেশন
+    let database, accessKeyRef, configRef;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        database = firebase.database();
+        accessKeyRef = database.ref('vip_mod_password/current_key'); // ইউজার পাসওয়ার্ড পাথ
+        configRef = database.ref('app_config'); // অন্যান্য কনফিগ পাথ
+    } catch (e) {
+        console.error("Firebase Initialization Error:", e);
+    }
+
+    // DOM এলিমেন্টস
+    const passwordInput = document.getElementById('passwordInput');
+    const loginOverlay = document.getElementById('loginOverlay');
+    const backgroundSite = document.getElementById('backgroundSite');
+    const topPanel = document.getElementById('topPanel');
+    const matrixCanvas = document.getElementById('matrixCanvas');
+    const telegramLink = document.getElementById('telegramLink');
+    const appTitle = document.getElementById('appTitle');
+    const signalText = document.getElementById('signalText');
+    const numberDisplay = document.getElementById('numberDisplay');
+    const errorMessage = document.getElementById('errorMessage');
+
+    const cycleLength = 30;
+    let correctPasswordCache = null; 
+    let currentCycleId = 0; 
+    let signalInterval;
+
+    // --- Firebase থেকে প্রাথমিক কনফিগ লোড করা ---
+    function loadAppConfig() {
+        if (!configRef) return;
+
+        configRef.once('value').then(snapshot => {
+            const config = snapshot.val() || {};
+            const title = config.title || "VIP WINGO 30S MOD - MURAD";
+            appTitle.textContent = title;
+            const telegramUrl = config.telegramUrl || telegramLink.href; 
+            telegramLink.href = telegramUrl;
+            telegramLink.textContent = config.telegramText || "Join Telegram S N COMMUNITY";
+        }).catch(error => {
+            console.error("Error loading config:", error);
+        });
+    }
+
+    // --- ম্যাট্রিক্স ইফেক্ট লজিক ---
+    const ctx = matrixCanvas.getContext('2d');
+    let width = matrixCanvas.width = window.innerWidth;
+    let height = matrixCanvas.height = window.innerHeight;
+    const y = Array(300).fill(0); 
+    const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+
+    function drawMatrix() {
+        if (loginOverlay.style.display !== 'none') {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = '#0F0'; 
+            ctx.font = '10pt Consolas';
+            y.forEach((yPos, index) => {
+                const text = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
+                const x = index * 10;
+                ctx.fillText(text, x, yPos);
+                if (yPos > 100 + Math.random() * 10000) {
+                    y[index] = 0;
+                } else {
+                    y[index] = yPos + 10;
+                }
+            });
+        }
+    }
+
+    // --- ইউজার লগইন লজিক (শুধুমাত্র ইউজার পাসওয়ার্ড চেক হবে) ---
+    function checkPassword() {
+        errorMessage.textContent = 'Verifying key...';
+        const inputPassword = passwordInput.value.trim().toUpperCase();
+        
+        if (inputPassword === "") {
+             errorMessage.textContent = '❌ ACCESS DENIED! Enter a key.';
+             return;
+        }
+
+        // ইউজার চেক (Firebase থেকে পাসওয়ার্ড আনা হবে)
+        if (!correctPasswordCache) {
+            accessKeyRef.once('value')
+                .then(snapshot => {
+                    const dbKey = snapshot.val();
+                    if (dbKey) {
+                        correctPasswordCache = String(dbKey).toUpperCase();
+                        verifyAccess(inputPassword);
+                    } else {
+                        errorMessage.textContent = '❌ Database Error. Access Key not set.';
+                        passwordInput.value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error("Firebase read failed:", error);
+                    errorMessage.textContent = '❌ Network Error. Check console.';
+                    passwordInput.value = '';
+                });
+        } else {
+            verifyAccess(inputPassword);
+        }
+    }
+
+    // পাসওয়ার্ড যাচাই করার মূল ফাংশন
+    function verifyAccess(inputPassword) {
+        if (inputPassword === correctPasswordCache) {
+            loginOverlay.style.display = 'none';
+            topPanel.style.display = 'flex';
+            backgroundSite.style.visibility = 'visible';
+            backgroundSite.style.opacity = 1;
+            errorMessage.textContent = '';
+            clearInterval(matrixInterval);
+            matrixCanvas.style.display = 'none';
+        } else {
+            errorMessage.textContent = '❌ ACCESS DENIED! Invalid Key.';
+            passwordInput.value = '';
+        }
+    }
+
+    // --- হ্যাক চালু করার লজিক (Signal Logic) ---
+    function startSignalHack() {
+        document.getElementById('preStartPanel').style.display = 'none';
+        document.getElementById('signalDisplay').style.display = 'flex';
+        
+        const now = new Date();
+        const totalSeconds = Math.floor(now.getTime() / 1000);
+        currentCycleId = Math.floor(totalSeconds / cycleLength);
+
+        signalInterval = setInterval(updateSignalDisplay, 100);
+        generateNewSignal();
+    }
+    
+    // সিগন্যাল টাইমিং ফিক্স লজিক
+    function updateSignalDisplay() {
+        const now = new Date();
+        const seconds = now.getSeconds();
+        const milliseconds = now.getMilliseconds();
+        
+        const clockTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        document.getElementById('currentClock').textContent = clockTime;
+        
+        let remaining = cycleLength - (seconds % cycleLength) - 1; 
+        const remainingMs = 1000 - milliseconds;
+        let totalRemaining = remaining + (remainingMs / 1000);
+        
+        if (totalRemaining < 0) totalRemaining = 0;
+        document.getElementById('remainingTimer').textContent = `${totalRemaining.toFixed(1)}s`;
+
+        const totalSeconds = Math.floor(now.getTime() / 1000);
+        const newCycleId = Math.floor(totalSeconds / cycleLength);
+
+        if (newCycleId !== currentCycleId) {
+            currentCycleId = newCycleId; 
+            
+            signalText.classList.add('flashing');
+            numberDisplay.classList.add('flashing');
+            
+            generateNewSignal();
+            
+            setTimeout(() => {
+                signalText.classList.remove('flashing');
+                numberDisplay.classList.remove('flashing');
+            }, 500); 
+        }
+    }
+
+    // ডামি সিগন্যাল জেনারেটর
+    function generateNewSignal() {
+        const randomNumber = Math.floor(Math.random() * 10); 
+        let signalData = {};
+
+        if (randomNumber % 2 === 1) { 
+            signalData.text = 'GREEN';
+            signalData.color = '#28a745'; 
+            signalData.numColor = '#28a745';
+        } else {
+            signalData.text = 'RED';
+            signalData.color = '#dc3545';
+            signalData.numColor = '#dc3545';
+        }
+        
+        if (randomNumber === 0) {
+            signalData.text = 'RED/VIOLET';
+            signalData.color = 'linear-gradient(to right, #dc3545 50%, #6f42c1 50%)';
+            signalData.numColor = '#6f42c1'; 
+        } else if (randomNumber === 5) {
+            signalData.text = 'GREEN/VIOLET';
+            signalData.color = 'linear-gradient(to right, #28a745 50%, #6f42c1 50%)';
+            signalData.numColor = '#6f42c1';
+        }
+        
+        signalText.textContent = signalData.text;
+        
+        if (randomNumber === 0 || randomNumber === 5) {
+            signalText.style.backgroundImage = signalData.color;
+            signalText.style.backgroundColor = 'transparent'; 
+        } else {
+            signalText.style.backgroundColor = signalData.color;
+            signalText.style.backgroundImage = 'none';
+        }
+        
+        numberDisplay.textContent = randomNumber;
+        numberDisplay.style.backgroundColor = signalData.numColor;
+    }
+
+    passwordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { checkPassword(); } });
+    if (typeof firebase !== 'undefined') { loadAppConfig(); }
+    const matrixInterval = setInterval(drawMatrix, 50);
+   
+</script>
+
+</body>
+</html>
